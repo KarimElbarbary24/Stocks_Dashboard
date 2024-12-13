@@ -1,0 +1,29 @@
+services:
+  dash:
+    image: karimelbarbary2024/stocks_dash
+    ports:
+      - "8050:8050"
+    env_file:
+      - .env
+    volumes:
+      - ./:/Stocks_Dashboard
+    networks:
+      - dbnetwork
+  
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    networks:
+      - dbnetwork
+
+volumes:
+  postgresdata:
+
+networks:
+  dbnetwork:
+    driver: bridge

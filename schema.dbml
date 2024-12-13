@@ -1,0 +1,44 @@
+Table stock_data {
+  id serial [pk, note: "Unique identifier for each record"]
+  symbol varchar(10) [note: "Stock ticker (e.g., AAPL)"]
+  date date [note: "Date of the stock data"]
+  open numeric [note: "Opening price"]
+  high numeric [note: "High price"]
+  low numeric [note: "Low price"]
+  close numeric [note: "Closing price"]
+  volume bigint [note: "Trading volume"]
+}
+
+Table technical_indicators {
+  id serial [pk, note: "Unique identifier for each record"]
+  symbol varchar(10) [ref: > stock_data.symbol, note: "Stock ticker linked to stock_data.symbol"]
+  date date [ref: > stock_data.date, note: "Date linked to stock_data.date"]
+  sma_50 numeric [note: "50-day simple moving average"]
+  sma_200 numeric [note: "200-day simple moving average"]
+  rsi numeric [note: "Relative Strength Index"]
+  bollinger_upper numeric [note: "Upper Bollinger Band"]
+  bollinger_lower numeric [note: "Lower Bollinger Band"]
+}
+
+Table sentiment_data {
+  id serial [pk, note: "Unique identifier for each record"]
+  symbol varchar(10) [ref: > stock_data.symbol, note: "Stock ticker linked to stock_data.symbol"]
+  date date [ref: > stock_data.date, note: "Date linked to stock_data.date"]
+  source varchar(50) [note: "Source of sentiment (e.g., Twitter)"]
+  sentiment_score numeric [note: "Sentiment score (-1 to 1 or 0 to 100)"]
+  raw_text text [note: "Raw text of the sentiment source"]
+}
+
+Table fundamental_data {
+  id serial [pk, note: "Unique identifier for each record"]
+  symbol varchar(10) [ref: > stock_data.symbol, note: "Stock ticker linked to stock_data.symbol"]
+  report_date date [note: "Date of the financial report"]
+  revenue bigint [note: "Revenue in dollars"]
+  earnings bigint [note: "Earnings in dollars"]
+  pe_ratio numeric [note: "Price-to-earnings ratio"]
+  dividend_yield numeric [note: "Dividend yield"]
+}
+
+Ref: stock_data.id > technical_indicators.symbol
+Ref: stock_data.id > sentiment_data.symbol
+Ref: stock_data.id > fundamental_data.symbol
