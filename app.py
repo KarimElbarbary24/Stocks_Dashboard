@@ -5,19 +5,19 @@ from dash.dependencies import Input, Output
 from stocks import Stocks
 import plotly.express as px
 
-# Initialize the Stocks class and database connection
+
 stocks = Stocks()
 
-# Dash app setup
+
 app = dash.Dash(__name__, external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"])
 
-# Fetch available stock symbols (replace this with a more dynamic list if needed)
+
 dropdown_options = [
     {"label": "Apple (AAPL)", "value": "AAPL"},
     {"label": "Google (GOOGL)", "value": "GOOGL"},
 ]
 
-# Layout
+
 app.layout = html.Div([
     html.H1("Stock Dashboard", style={"text-align": "center", "margin-bottom": "20px"}),
 
@@ -52,7 +52,7 @@ app.layout = html.Div([
     ], style={"margin-top": "50px"})
 ])
 
-# Callbacks
+
 @app.callback(
     [Output("stock-graph-container", "children"),
      Output("fundamental-data-container", "children")],
@@ -61,7 +61,7 @@ app.layout = html.Div([
 )
 def update_graph_and_fundamental_data(stock_symbol, indicator_toggle):
     try:
-        # Ensure data exists in the database
+
         query = f"SELECT COUNT(*) FROM stock_data WHERE symbol = '{stock_symbol}'"
         with stocks.engine.connect() as conn:
             result = conn.execute(query).scalar()
@@ -73,12 +73,12 @@ def update_graph_and_fundamental_data(stock_symbol, indicator_toggle):
         else:
             df = stocks.get_stock_data(stock_symbol)
 
-        # Add technical indicators
+
         if indicator_toggle == "show":
             stocks.calculate_technical_indicators(stock_symbol)
             df = stocks.get_stock_data(stock_symbol)
 
-        # Plot the data
+
         fig = px.line(
             df,
             x="date",
@@ -87,10 +87,10 @@ def update_graph_and_fundamental_data(stock_symbol, indicator_toggle):
             title=f"{stock_symbol} Stock Prices" + (" with Technical Indicators" if indicator_toggle == "show" else "")
         )
 
-        # Fetch fundamental data
+
         stocks.fetch_and_upload_fundamental_data(stock_symbol)
 
-        # Retrieve fundamental data
+
         query = f"""
         SELECT report_date, revenue, earnings, pe_ratio, dividend_yield
         FROM fundamental_data
@@ -127,6 +127,6 @@ def update_graph_and_fundamental_data(stock_symbol, indicator_toggle):
         ])
         return error_message, error_message
 
-# Run the app
+
 if __name__ == "__main__":
     app.run_server(debug=True, host="0.0.0.0", port=8050)
